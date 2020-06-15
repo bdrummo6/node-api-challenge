@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/api', (req, res) => {
+router.get('/', (req, res) => {
 	res.json({
-		message: 'Welcome to the API for the Sprint Challenge!',
+		message: 'Welcome to the API for the Node API Challenge!'
 	})
 })
 

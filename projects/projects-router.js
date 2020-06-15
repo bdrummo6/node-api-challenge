@@ -2,8 +2,7 @@ const express = require('express');
 const db = require('../data/helpers/projectModel');
 const router = express.Router();
 
-/*
-router.get('/api/projects', (req, res) => {
+router.get('/', (req, res) => {
 	db.get()
 		.then((projects) => {
 			res.status(200).json(projects)
@@ -15,18 +14,11 @@ router.get('/api/projects', (req, res) => {
 			})
 		})
 })
-*/
 
-router.get('/api/projects/:id', (req, res) => {
+router.get('/:id', (req, res) => {
 	db.get(req.params.id)
-		.then((project) => {
-			if (project[0]) {
-				res.status(200).json(project[0])
-			} else {
-				res.status(404).json({
-					message: 'The project with the specified ID does not exist.'
-				})
-			}
+		.then(project => {
+			res.status(200).json(project)
 		})
 		.catch((error) => {
 			console.log(error)
@@ -36,8 +28,8 @@ router.get('/api/projects/:id', (req, res) => {
 		})
 })
 
-router.post('/api/projects', (req, res) => {
-	if (!req.body.name || !req.body.description) {
+router.post('/', (req, res) => {
+	if (!req.body.name || !req.body.description || !req.body.completed) {
 		return res.status(400).json({
 			errorMessage: 'Please provide name and description for the project.'
 		})
@@ -58,7 +50,7 @@ router.post('/api/projects', (req, res) => {
 		})
 })
 
-router.put('/api/projects/:id', (req, res) => {
+router.put('/:id', (req, res) => {
 	if (!req.body.name || !req.body.description) {
 		return res.status(400).json({
 			errorMessage: 'Please provide name and description for the project.'
@@ -86,7 +78,7 @@ router.put('/api/projects/:id', (req, res) => {
 		})
 })
 
-router.delete('/api/projects/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
 	db.remove(req.params.id)
 		.then((count) => {
 			if (count > 0) {
@@ -103,6 +95,18 @@ router.delete('/api/projects/:id', (req, res) => {
 			console.log(error)
 			res.status(500).json({
 				error: 'The project could not be removed'
+			})
+		})
+})
+
+router.get('/:id/actions', (req, res) => {
+	db.getProjectActions(req.params.id)
+		.then(action => {
+			res.status(200).json(action)
+		})
+		.catch(err => {
+			res.status(500).json({
+				Message: 'There are no actions for this project'
 			})
 		})
 })

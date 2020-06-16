@@ -1,8 +1,11 @@
 const express = require('express');
-const db = require('../data/helpers/projectModel');
+const db = require('../data/helpers/projectModel'); // Imports project helper functions
+
 const router = express.Router();
 
+// Returns All Projects
 router.get('/', (req, res) => {
+	// Helper function to get all projects
 	db.get()
 		.then((projects) => {
 			res.status(200).json(projects)
@@ -10,12 +13,14 @@ router.get('/', (req, res) => {
 		.catch((error) => {
 			console.log(error)
 			res.status(500).json({
-				error: 'The project information could not be retrieved.'
+				errorMessage: 'The project information could not be retrieved.'
 			})
 		})
 })
 
+// Returns the project with the given id
 router.get('/:id', (req, res) => {
+	// Helper function to get the project with the given id
 	db.get(req.params.id)
 		.then(project => {
 			res.status(200).json(project)
@@ -23,18 +28,20 @@ router.get('/:id', (req, res) => {
 		.catch((error) => {
 			console.log(error)
 			res.status(500).json({
-				error: 'The project information could not be retrieved.'
+				errorMessage: 'The project information could not be retrieved.'
 			})
 		})
 })
 
+// Creates a new Project
 router.post('/', (req, res) => {
-	if (!req.body.name || !req.body.description || !req.body.completed) {
+	// If the following fields are not completed then no project will be created
+	if (!req.body.name || !req.body.description) {
 		return res.status(400).json({
 			errorMessage: 'Please provide name and description for the project.'
 		})
 	}
-
+	// Helper function that adds the new project into the database
 	db.insert(req.body)
 		.then((projectId) => {
 			return db.get(projectId.id)
@@ -45,21 +52,23 @@ router.post('/', (req, res) => {
 		.catch((error) => {
 			console.log(error)
 			res.status(500).json({
-				error: 'There was an error while saving the project to the database'
+				errorMessage: 'There was an error while saving the project to the database'
 			})
 		})
 })
 
+// Updates a project with the given id
 router.put('/:id', (req, res) => {
+	// If the following fields are not completed the project will not be updated
 	if (!req.body.name || !req.body.description) {
 		return res.status(400).json({
 			errorMessage: 'Please provide name and description for the project.'
 		})
 	}
-
+	// Helper function that updates a project with the given id with the new data
 	db.update(req.params.id, req.body)
 		.then((projectId) => {
-			return db.findById(projectId.id)
+			return db.get(projectId.id)
 		})
 		.then((project) => {
 			if (project) {
@@ -73,12 +82,14 @@ router.put('/:id', (req, res) => {
 		.catch((error) => {
 			console.log(error)
 			res.status(500).json({
-				error: 'The project information could not be modified.'
+				errerrorMessage: 'The project information could not be modified.'
 			})
 		})
 })
 
+// Deletes the project with the given id
 router.delete('/:id', (req, res) => {
+	// Helper function that removes a project with the given id from the database
 	db.remove(req.params.id)
 		.then((count) => {
 			if (count > 0) {
@@ -94,19 +105,21 @@ router.delete('/:id', (req, res) => {
 		.catch((error) => {
 			console.log(error)
 			res.status(500).json({
-				error: 'The project could not be removed'
+				errorMessage: 'The project could not be removed'
 			})
 		})
 })
 
+// Returns all of the actions of a project with the given id
 router.get('/:id/actions', (req, res) => {
+	// Helper function that retrieves all of the action for a project with the given id
 	db.getProjectActions(req.params.id)
 		.then(action => {
 			res.status(200).json(action)
 		})
 		.catch(err => {
 			res.status(500).json({
-				Message: 'There are no actions for this project'
+				message: 'There are no actions for this project'
 			})
 		})
 })
